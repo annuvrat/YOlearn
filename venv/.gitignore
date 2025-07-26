@@ -1,0 +1,57 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django-specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+media/
+staticfiles/
+*.sqlite3
+
+# Env
+.env
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# VSCode and editor config
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Node (if you're using npm for frontend assets)
+node_modules/
+
+# Migrations (optional — useful in early dev stages)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Coverage / test output
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Postman collections and environments
+*.postman_collection.json
