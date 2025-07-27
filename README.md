@@ -5,6 +5,14 @@ A comprehensive full-stack platform for managing AI-generated content with secur
 ## 🚀 Overview
 
 YOlearn provides a complete solution for AI content management, featuring secure user authentication, efficient data storage, and real-time synchronization. The platform enables authenticated users to store, retrieve, and manage AI-generated outputs from various tools including AI Tutor and Quiz Builder.
+## 🌐 Live Environment
+
+| Service | URL |
+|---------|-----|
+| **Frontend Application** | [https://yolearn.vercel.app](https://yolearn-frontend.vercel.app/) |
+| **API - Store Output** | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
+| **API - Retrieve Outputs** | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
+
 
 ## 🏗️ Architecture
 
@@ -16,14 +24,6 @@ YOlearn provides a complete solution for AI content management, featuring secure
 | **Authentication** | Supabase JWT with Row Level Security |
 | **Real-time** | Supabase Realtime |
 | **Deployment** | Vercel (Frontend), Render (Backend) |
-
-## 🌐 Live Environment
-
-| Service | URL |
-|---------|-----|
-| **Frontend Application** | [https://yolearn.vercel.app](https://yolearn-frontend.vercel.app/) |
-| **API - Store Output** | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
-| **API - Retrieve Outputs** | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
 
 ## 📋 Features
 
