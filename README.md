@@ -15,7 +15,7 @@ YOlearn provides a complete solution for AI content management, featuring secure
 
 ## API Testing
 
-A Postman collection is included in [`api-docs/api-testing.postman_collection.json`](./api-docs/api-testing.postman_collection.json).
+A Postman collection is included in [`api-docs/api-testing.postman_collection.json`](./postman/.postman_collection.json).
 
 You can import it into Postman to test the endpoints.
 
