@@ -24,6 +24,11 @@ logging.basicConfig(
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
+print(SUPABASE_JWT_SECRET)
+# Log environment variable status
+logging.info(f"SUPABASE_URL: {SUPABASE_URL}")
+logging.info(f"SUPABASE_SERVICE_KEY: {'SET' if SUPABASE_SERVICE_KEY else 'NOT SET'}")
+logging.info(f"SUPABASE_JWT_SECRET: {'SET' if SUPABASE_JWT_SECRET else 'NOT SET'}")
 
 
 class StoreOutputView(APIView):
@@ -104,87 +109,92 @@ class StoreOutputView(APIView):
             )
 
 
-class GetOutputsView(APIView):
-    permission_classes = [AllowAny]
-    parser_classes = [JSONParser]
 
+
+class GetOutputsView(APIView):
     def get(self, request):
-        auth_header = request.headers.get("Authorization")
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return Response({"error": "Missing or invalid Authorization header"}, status=401)
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({"error": "Missing or invalid token"}, status=401)
 
         token = auth_header.split(" ")[1]
+        try:
+            decoded = jwt.decode(
+                token,
+                SUPABASE_JWT_SECRET,
+                algorithms=["HS256"],
+                options={"verify_aud": False}
+            )
+            user_id = decoded['sub']
+        except jwt.InvalidTokenError as e:
+            return Response({"error": f"Token decode error: {str(e)}"}, status=401)
 
-        # Decode Supabase JWT to get user_id
-        user_info_resp = requests.get(
-            f"{SUPABASE_URL}/auth/v1/user",
-            headers={"Authorization": f"Bearer {token}", "apikey": SUPABASE_SERVICE_KEY}
-        )
-        if user_info_resp.status_code != 200:
-            return Response({"error": "Invalid Supabase token"}, status=401)
+        # Filters
+        tool = request.query_params.get('tool')
+        date = request.query_params.get('date')
 
-        user_id = user_info_resp.json().get("id")
-        if not user_id:
-            return Response({"error": "User ID not found in token"}, status=401)
+        # Validate date
+        if date:
+            try:
+                datetime.strptime(date, "%Y-%m-%d")
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
 
         # Pagination
         try:
-            page = int(request.query_params.get("page", 1))
-            limit = int(request.query_params.get("limit", 10))
+            limit = int(request.query_params.get('limit', 10))
+            page = int(request.query_params.get('page', 1))
             offset = (page - 1) * limit
         except ValueError:
-            return Response({"error": "Invalid page or limit value"}, status=400)
+            return Response({"error": "Invalid pagination params"}, status=400)
 
-        # Optional filters
-        tool = request.query_params.get("tool")
-        date = request.query_params.get("date")  # Expected in YYYY-MM-DD
-
-        filters = [f"user_id=eq.{user_id}"]
+        # Base filters
+        filter_query = f"user_id=eq.{user_id}"
         if tool:
-            filters.append(f"tool_name=eq.{tool}")
+            filter_query += f"&tool_name=eq.{tool}"
         if date:
-            try:
-                parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
-                filters.append(f"created_at::date=eq.{parsed_date}")
-            except ValueError:
-                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+            filter_query += f"&created_at=gte.{date}T00:00:00Z&created_at=lt.{date}T23:59:59Z"
 
-        filter_str = "&".join(filters)
-
+        # Count query for pagination metadata
+        count_url = f"{SUPABASE_URL}/rest/v1/ai_outputs?{filter_query}&select=id"
         headers = {
             "apikey": SUPABASE_SERVICE_KEY,
             "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
             "Prefer": "count=exact"
         }
-
-        # Count total matching items
-        count_url = f"{SUPABASE_URL}/rest/v1/ai_outputs?{filter_str}&select=id"
-        count_resp = requests.get(count_url, headers=headers)
-
-        if count_resp.status_code != 200:
+        
+        logging.info(f"Count URL: {count_url}")
+        count_response = requests.get(count_url, headers=headers)
+        logging.info(f"Count response status: {count_response.status_code}")
+        
+        if count_response.status_code not in [200, 206]:
+            logging.error(f"Count failed: {count_response.status_code} - {count_response.text}")
             return Response({"error": "Failed to count items from Supabase"}, status=500)
-
-        content_range = count_resp.headers.get("content-range")
+            
+        content_range = count_response.headers.get("content-range")
+        logging.info(f"Content-Range header: {content_range}")
+        
         try:
             total_items = int(content_range.split("/")[-1]) if content_range else 0
-        except Exception:
+        except Exception as e:
+            logging.error(f"Error parsing content-range: {e}")
             total_items = 0
+        total_pages = (total_items + limit - 1) // limit  # ceil
 
-        total_pages = (total_items + limit - 1) // limit if limit > 0 else 1
+        # Final query to get paginated data
+        data_url = f"{SUPABASE_URL}/rest/v1/ai_outputs?{filter_query}&select=tool_name,output_content,created_at&limit={limit}&offset={offset}"
+        logging.info(f"Data URL: {data_url}")
+        data_response = requests.get(data_url, headers=headers)
+        logging.info(f"Data response status: {data_response.status_code}")
 
-        # Get actual data
-        data_url = f"{SUPABASE_URL}/rest/v1/ai_outputs?{filter_str}&select=tool_name,output_content,created_at&order=created_at.desc&limit={limit}&offset={offset}"
-        data_resp = requests.get(data_url, headers=headers)
-
-        if data_resp.status_code != 200:
+        if data_response.status_code not in [200, 206]:
+            logging.error(f"Data failed: {data_response.status_code} - {data_response.text}")
             return Response({"error": "Failed to fetch data from Supabase"}, status=500)
-
-        data = data_resp.json()
 
         return Response({
             "page": page,
             "limit": limit,
             "total_pages": total_pages,
             "total_items": total_items,
-            "data": data
-        })
+            "data": data_response.json()
+        }, status=200)
