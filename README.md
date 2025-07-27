@@ -108,8 +108,7 @@ Store AI-generated content for the authenticated user.
   "tool_name": "quiz_builder",
   "output_content": {
     "questions": ["What is AI?", "Define neural networks."],
-    "difficulty": "easy",
-    "subject": "artificial_intelligence"
+    "difficulty": "easy"
   }
 }
 ```
@@ -117,9 +116,22 @@ Store AI-generated content for the authenticated user.
 **Response:**
 ```json
 {
-  "success": true,
-  "message": "Output stored successfully",
-  "id": "550e8400-e29b-41d4-a716-446655440000"
+    "message": "Output stored successfully",
+    "data": [
+        {
+            "id": "e682ad8b-1ecf-4b9d-80e2-6f7dee6fdebf",
+            "created_at": "2025-07-27T10:37:31.546879+00:00",
+            "user_id": "871ff812-7b64-4b61-a062-616765820f6c",
+            "tool_name": "namaste",
+            "output_content": {
+                "questions": [
+                    "What is AI?",
+                    "Define  networks."
+                ],
+                "difficulty": "hard"
+            }
+        }
+    ]
 }
 ```
 
