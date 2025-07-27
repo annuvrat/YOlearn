@@ -82,7 +82,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-anon-key
 SUPABASE_JWT_SECRET=your-jwt-secret
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+
 ```
 
 ## 📚 API Documentation
@@ -144,23 +144,22 @@ GET /api/get-outputs/?tool_name=quiz_builder&date=2025-07-17&page=1&limit=10
 **Response:**
 ```json
 {
-  "results": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "tool_name": "quiz_builder",
-      "output_content": {
-        "questions": ["What is AI?", "Define neural networks."],
-        "difficulty": "easy"
-      },
-      "created_at": "2025-07-17T13:45:00.000Z"
-    }
-  ],
-  "pagination": {
     "page": 1,
-    "limit": 10,
-    "total": 1,
-    "total_pages": 1
-  }
+    "limit": 2,
+    "total_pages": 1,
+    "total_items": 2,
+    "data": [
+        {
+            "tool_name": "namaste",
+            "output_content": {
+                "questions": [
+                    "What is AI?",
+                    "Define  networks."
+                ],
+                "difficulty": "diff"
+            },
+            "created_at": "2025-07-27T04:19:17.23088+00:00"
+        },...
 }
 ```
 
