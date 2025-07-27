@@ -1,165 +1,273 @@
-# 🧠 YOlearn – AI Output Integration Platform
+# YOlearn - AI Output Integration Platform
 
-YOlearn is a full-stack AI output integration platform. It allows authenticated users to submit and retrieve AI-generated content with secure database access using Supabase, Django REST API, and a React frontend.
+A comprehensive full-stack platform for managing AI-generated content with secure authentication, real-time updates, and robust data management capabilities.
 
----
+## 🚀 Overview
 
-## ⚙️ Technologies Used
+YOlearn provides a complete solution for AI content management, featuring secure user authentication, efficient data storage, and real-time synchronization. The platform enables authenticated users to store, retrieve, and manage AI-generated outputs from various tools including AI Tutor and Quiz Builder.
 
-| Layer     | Stack                                     |
-|-----------|-------------------------------------------|
-| Frontend  | React + Supabase Auth                     |
-| Backend   | Django + Django REST Framework            |
-| Auth      | Supabase JWT                              |
-| Database  | Supabase PostgreSQL + RLS                 |
-| Hosting   | Vercel (Frontend) + Render (Backend)      |
+## 🏗️ Architecture
 
----
+| Component | Technology Stack |
+|-----------|------------------|
+| **Frontend** | React.js, Supabase Auth |
+| **Backend** | Django, Django REST Framework |
+| **Database** | Supabase PostgreSQL |
+| **Authentication** | Supabase JWT with Row Level Security |
+| **Real-time** | Supabase Realtime |
+| **Deployment** | Vercel (Frontend), Render (Backend) |
 
-## 🌐 Live URLs
+## 🌐 Live Environment
 
-| Component | Link                                        |
-|-----------|---------------------------------------------|
-| Frontend  | [https://yolearn.vercel.app](https://yolearn-frontend.vercel.app/) |
-| Backend   | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
-| Backend   | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
+| Service | URL |
+|---------|-----|
+| **Frontend Application** | [https://yolearn.vercel.app](https://yolearn-frontend.vercel.app/) |
+| **API - Store Output** | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
+| **API - Retrieve Outputs** | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
 
----
+## 📋 Features
 
-## 📦 Backend Setup Guide (Local)
+### Core Functionality
+- **Secure AI Output Storage**: Store AI-generated content with user authentication
+- **Advanced Retrieval**: Filter outputs by tool, date, or search terms
+- **Real-time Updates**: Live notifications for new AI outputs
+- **Pagination Support**: Efficient handling of large datasets
+- **Row Level Security**: Database-level access control
+
+### Security & Performance
+- JWT-based authentication with Supabase
+- CORS handling for cross-origin requests
+- Request validation and sanitization
+- Comprehensive logging system
+- Error handling and validation
+
+## 🔧 Installation & Setup
+
+### Prerequisites
+- Python 3.8+
+- Node.js 16+
+- Supabase account
+
+### Backend Setup
 
 ```bash
-# Clone the repo
+# Clone the repository
 git clone https://github.com/annuvrat/YOlearn.git
 cd YOlearn
 
-# (Optional) Create virtual environment
+# Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Add a .env file
-touch .env
-# Add your variables:
-# SUPABASE_URL=
-# SUPABASE_KEY=
-# SUPABASE_JWT_SECRET=
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials
 
-# Run migrations
+# Run database migrations
 python manage.py migrate
 
-# Run server
+# Start development server
 python manage.py runserver
----
-## 🔐 Authentication Flow
+```
 
-    Uses Supabase Auth
+### Environment Configuration
 
-    Pass JWT token in Authorization: Bearer <token> header
+Create a `.env` file in the project root:
 
-    Backend extracts user_id from token
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
+SUPABASE_JWT_SECRET=your-jwt-secret
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
 
-    Data access is secured via RLS policies
-📤 POST /api/store-output/
+## 📚 API Documentation
 
-Store AI-generated output.
+### Authentication
 
-Headers:
+All API endpoints require authentication via Supabase JWT token:
 
-Authorization: Bearer <Supabase_JWT_Token>
+```http
+Authorization: Bearer <supabase_jwt_token>
 Content-Type: application/json
+```
 
-Body:
+### Store AI Output
 
+**Endpoint:** `POST /api/store-output/`
+
+Store AI-generated content for the authenticated user.
+
+**Request Body:**
+```json
 {
   "tool_name": "quiz_builder",
   "output_content": {
     "questions": ["What is AI?", "Define neural networks."],
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "subject": "artificial_intelligence"
   }
 }
+```
 
-✅ Saves data in Supabase ai_outputs with:
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Output stored successfully",
+  "id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
 
-    user_id (from token)
+### Retrieve AI Outputs
 
-    tool_name
+**Endpoint:** `GET /api/get-outputs/`
 
-    output_content
+Fetch stored AI outputs with optional filtering.
 
-    created_at (auto)
+**Query Parameters:**
+- `tool_name` (optional): Filter by specific tool
+- `date` (optional): Filter by creation date (YYYY-MM-DD)
+- `search` (optional): Search within output content
+- `page` (optional): Page number for pagination
+- `limit` (optional): Items per page (default: 20)
 
-📥 GET /api/get-outputs/
+**Example Request:**
+```http
+GET /api/get-outputs/?tool_name=quiz_builder&date=2025-07-17&page=1&limit=10
+```
 
-Fetch stored outputs by tool, date, or search query.
-
-Headers:
-
-Authorization: Bearer <Supabase_JWT_Token>
-
-Optional Query Params:
-
-    tool_name=quiz_builder
-
-    date=2025-07-17
-
-    search=neural
-
-Response:
-
-[
-  {
-    "tool_name": "quiz_builder",
-    "output_content": { ... },
-    "created_at": "2025-07-17T13:45:00Z"
+**Response:**
+```json
+{
+  "results": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "tool_name": "quiz_builder",
+      "output_content": {
+        "questions": ["What is AI?", "Define neural networks."],
+        "difficulty": "easy"
+      },
+      "created_at": "2025-07-17T13:45:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "total_pages": 1
   }
-]
+}
+```
 
-✅ Supports:
+## 🗄️ Database Schema
 
-    Pagination
+### ai_outputs Table
 
-    Search
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key (auto-generated) |
+| `user_id` | UUID | User identifier from Supabase Auth |
+| `tool_name` | TEXT | AI tool identifier |
+| `output_content` | JSONB | AI-generated content |
+| `created_at` | TIMESTAMP | Record creation time |
 
-    Filter by tool or date
+### Row Level Security Policies
 
-    Only user's own data via RLS
+```sql
+-- Users can only access their own outputs
+CREATE POLICY "Users can view own outputs" ON ai_outputs
+FOR SELECT USING (auth.uid() = user_id);
 
-🔔 Bonus: Real-Time Updates
+CREATE POLICY "Users can insert own outputs" ON ai_outputs
+FOR INSERT WITH CHECK (auth.uid() = user_id);
+```
 
-    Frontend subscribes to Supabase ai_outputs via Realtime
+## 🔄 Real-time Integration
 
-    Users get a toast when a new output is inserted
+The platform supports real-time updates using Supabase Realtime:
 
-    Optionally auto-fetches new entries
+```javascript
+// Frontend subscription example
+const subscription = supabase
+  .channel('ai_outputs')
+  .on('postgres_changes', 
+    { event: 'INSERT', schema: 'public', table: 'ai_outputs' },
+    (payload) => {
+      // Handle new output notification
+      showToast('New AI output generated!');
+      refreshOutputs();
+    }
+  )
+  .subscribe();
+```
 
-🧪 Environment Variables
+## 🧪 Testing
 
-Example .env file:
+### API Testing with cURL
 
-SUPABASE_URL=https://xyz.supabase.co
-SUPABASE_KEY=your-supabase-api-key
-SUPABASE_JWT_SECRET=your-secret
+**Store Output:**
+```bash
+curl -X POST https://yolearn-1.onrender.com/api/store-output/ \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_name": "quiz_builder",
+    "output_content": {
+      "questions": ["Sample question?"],
+      "difficulty": "easy"
+    }
+  }'
+```
 
-✅ Features Checklist
+**Retrieve Outputs:**
+```bash
+curl -X GET "https://yolearn-1.onrender.com/api/get-outputs/?tool_name=quiz_builder" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
 
-Secure JWT-based user validation
+## 📊 Logging & Monitoring
 
-Supabase table ai_outputs with RLS
+- Application logs stored in `output.log`
+- Request/response logging for debugging
+- Error tracking and monitoring
+- Performance metrics collection
 
-POST + GET API with filtering
+## 🚀 Deployment
 
-Pagination & Search
+### Backend Deployment (Render)
+1. Connect GitHub repository to Render
+2. Configure environment variables
+3. Set build command: `pip install -r requirements.txt`
+4. Set start command: `gunicorn yolearn.wsgi:application`
 
-Logs stored in output.log
+### Frontend Deployment (Vercel)
+1. Connect repository to Vercel
+2. Configure Supabase environment variables
+3. Deploy with automatic CI/CD
 
-Real-time frontend updates
+## 🤝 Contributing
 
-    Live deployed frontend + backend
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-📬 Contact
+## 📄 License
 
-Made with ❤️ by annuvrat
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 👨‍💻 Author
+
+**Annuvrat**
+- GitHub: [@annuvrat](https://github.com/annuvrat)
+- Project Link: [https://github.com/annuvrat/YOlearn](https://github.com/annuvrat/YOlearn)
+
+---
+
+*Built with ❤️ using Django, React, and Supabase*
