@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-7@uy+-w*&+$o5&%va-fg)9xr6(^#l_6oawyq%2*s*i$^6msq4c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    os.getenv("RENDER_EXTERNAL_HOSTNAME", ""),  # Render auto sets this
+    'yolearn.onrender.com',
+]
 
 
 # Application definition
