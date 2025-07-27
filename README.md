@@ -13,6 +13,14 @@ YOlearn provides a complete solution for AI content management, featuring secure
 | **API - Store Output** | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
 | **API - Retrieve Outputs** | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
 
+## API Testing
+
+A Postman collection is included in [`api-docs/api-testing.postman_collection.json`](./api-docs/api-testing.postman_collection.json).
+
+You can import it into Postman to test the endpoints.
+
+Alternatively, use the provided `curl` examples below.
+
 
 ## 🏗️ Architecture
 
