@@ -21,7 +21,8 @@ YOlearn is a full-stack AI output integration platform. It allows authenticated 
 | Component | Link                                        |
 |-----------|---------------------------------------------|
 | Frontend  | [https://yolearn.vercel.app](https://yolearn-frontend.vercel.app/) |
-| Backend   | [https://yolearn-1.onrender.com](https://yolearn-1.onrender.com) |
+| Backend   | [https://yolearn-1.onrender.com/api/store-output](https://yolearn-1.onrender.com/api/store-output) |
+| Backend   | [https://yolearn-1.onrender.com/api/get-outputs](https://yolearn-1.onrender.com/api/get-outputs) |
 
 ---
 
