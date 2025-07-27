@@ -105,10 +105,10 @@ Store AI-generated content for the authenticated user.
 **Request Body:**
 ```json
 {
-  "tool_name": "quiz_builder",
+  "tool_name": "namaste",
   "output_content": {
-    "questions": ["What is AI?", "Define neural networks."],
-    "difficulty": "easy"
+    "questions": ["What is AI?", "Define  networks."],
+    "difficulty": "hard"
   }
 }
 ```
